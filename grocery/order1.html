@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Place Your Order</title>
+<style>
+      body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f2f2;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .products {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .product-item {
+      width: 200px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .product-item:hover {
+      transform: scale(1.03);
+    }
+
+    .product-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .product-info h3 {
+      margin: 10px 0 5px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .product-info p {
+      margin: 4px 0;
+      color: #666;
+    }
+
+    .product-info input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-top: 5px;
+    }
+
+    .order-details {
+      margin-top: 40px;
+      border-top: 1px solid #ccc;
+      padding-top: 30px;
+    }
+
+    .order-details h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+    }
+
+    .submit-btn {
+      display: block;
+      margin: 30px auto 0;
+      padding: 12px 30px;
+      background: #28a745;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background: #218838;
+    }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Place Your Grocery Order</h1>
+
+    <form id="orderForm">
+      <div class="products" id="productsContainer"></div>
+
+      <div class="order-details">
+        <h2>Customer Details</h2>
+
+        <div class="form-group">
+          <label for="customerName">Full Name</label>
+          <input type="text" id="customerName" name="customerName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="customerAddress">Address</label>
+          <textarea id="customerAddress" name="customerAddress" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="customerPhone">Phone Number</label>
+          <input type="tel" id="customerPhone" name="customerPhone" pattern="[0-9]{10}" placeholder="10-digit number" required />
+        </div>
+
+        <button class="submit-btn" type="submit">Submit Order</button>
+      </div>
+    </form>
+  </div>
+  
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+  // Your Firebase config and init
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3wvj7pLB5AsahfRE_xd4AmEkGfRuEIZ8",
+    authDomain: "authentication-app-cf09d.firebaseapp.com",
+    databaseURL: "https://authentication-app-cf09d-default-rtdb.firebaseio.com",
+    projectId: "authentication-app-cf09d",
+    storageBucket: "authentication-app-cf09d.appspot.com",
+    messagingSenderId: "82317472416",
+    appId: "1:82317472416:web:6d0bc95248ca455c834fc5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth();
+
+  // Your products array (unchanged)
+  const products = [
+    { name: "Rice", category: "grains", imageUrl: "images/rice.jpeg", price: 50, unit: "per kg" },
+    { name: "Wheat flour (Atta)", category: "grains", imageUrl: "images/wheatflour.jpg", price: 40, unit: "per kg" },
+    { name: "Lentils (Toor dal,etc.)", category: "grains", imageUrl: "images/Lentils.jpeg", price: 120, unit: "per kg" },
+    { name: "Sugar", category: "grains", imageUrl: "images/sugar.jpg", price: 45, unit: "per kg" },
+    { name: "Salt", category: "grains", imageUrl: "images/salt.jpeg", price: 20, unit: "per kg" },
+    { name: "Cooking oil", category: "grains", imageUrl: "images/oil.jpg", price: 150, unit: "per litre" },
+    { name: "Semolina (Rava)", category: "grains", imageUrl: "images/rava.jpg", price: 60, unit: "per kg" },
+    { name: "Poha (Flattened rice)", category: "grains", imageUrl: "images/flarice.jpg", price: 55, unit: "per kg" },
+    { name: "Maida (Refined flour)", category: "grains", imageUrl: "images/maida.jpeg", price: 45, unit: "per kg" },
+    { name: "Besan (Gram flour)", category: "grains", imageUrl: "images/gram.webp", price: 70, unit: "per kg" },
+    { name: "Turmeric powder", category: "spices", imageUrl: "images/turmeric.jpeg", price: 100, unit: "per 100g" },
+    { name: "Red chili powder", category: "spices", imageUrl: "images/rcp.jpeg", price: 90, unit: "per 100g" },
+    { name: "Cumin seeds", category: "spices", imageUrl: "images/cumin.webp", price: 110, unit: "per 100g" },
+    { name: "Mustard seeds", category: "spices", imageUrl: "images/mustard.jpeg", price: 80, unit: "per 100g" },
+    { name: "Garam masala", category: "spices", imageUrl: "images/garam.webp", price: 120, unit: "per 100g" },
+    { name: "Potatoes", category: "veggies", imageUrl: "images/potato.jpeg", price: 30, unit: "per kg" },
+    { name: "Onions", category: "veggies", imageUrl: "images/onion.png", price: 25, unit: "per kg" },
+    { name: "Tomatoes", category: "veggies", imageUrl: "images/tomato.webp", price: 40, unit: "per kg" },
+    { name: "Garlic", category: "veggies", imageUrl: "images/gc.webp", price: 60, unit: "per 100g" },
+    { name: "Green chilies", category: "veggies", imageUrl: "images/gp.jpeg", price: 20, unit: "per 100g" },
+    { name: "Seasonal fruits (Bananas, Apples, etc.)", category: "veggies", imageUrl: "images/ab.jpg", price: 80, unit: "per kg" },
+    { name: "Leafy greens (Spinach, Coriander, etc.)", category: "veggies", imageUrl: "images/spinach.webp", price: 30, unit: "per bunch" },
+    { name: "Milk", category: "dairy", imageUrl: "images/milky.jpeg", price: 50, unit: "per litre" },
+    { name: "Curd/Yogurt", category: "dairy", imageUrl: "images/curd.jpg", price: 45, unit: "per 500g" },
+    { name: "Eggs", category: "dairy", imageUrl: "images/egg.jpg", price: 60, unit: "per dozen" },
+    { name: "Paneer or Tofu", category: "dairy", imageUrl: "images/paneer.webp", price: 150, unit: "per 500g" },
+    { name: "Butter or Ghee", category: "dairy", imageUrl: "images/ghee.jpeg", price: 250, unit: "per 500g" }
+  ];
+
+  function getOrderFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const orderStr = params.get('order');
+    if (!orderStr) return null;
+    try {
+      return JSON.parse(decodeURIComponent(orderStr));
+    } catch {
+      return null;
+    }
+  }
+
+  function createProductInput(product, index) {
+    const div = document.createElement('div');
+    div.className = 'product-item';
+
+    const img = document.createElement('img');
+    img.src = product.imageUrl || 'https://via.placeholder.com/80x60?text=No+Image';
+    img.alt = product.name;
+
+    const info = document.createElement('div');
+    info.className = 'product-info';
+
+    const nameP = document.createElement('p');
+    nameP.textContent = product.name;
+
+    const priceP = document.createElement('p');
+    priceP.textContent = `Price: ₹${product.price} (${product.unit})`;
+
+    info.appendChild(nameP);
+    info.appendChild(priceP);
+
+    const qtyLabel = document.createElement('label');
+    qtyLabel.textContent = 'Quantity:';
+    qtyLabel.setAttribute('for', `qty${index}`);
+
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'number';
+    qtyInput.id = `qty${index}`;
+    qtyInput.name = `qty${index}`;
+    qtyInput.min = 1;
+    qtyInput.value = 1;
+    qtyInput.required = true;
+
+    info.appendChild(qtyLabel);
+    info.appendChild(qtyInput);
+
+    const hiddenName = document.createElement('input');
+    hiddenName.type = 'hidden';
+    hiddenName.name = `productName${index}`;
+    hiddenName.value = product.name;
+
+    const hiddenPrice = document.createElement('input');
+    hiddenPrice.type = 'hidden';
+    hiddenPrice.name = `productPrice${index}`;
+    hiddenPrice.value = product.price;
+
+    info.appendChild(hiddenName);
+    info.appendChild(hiddenPrice);
+
+    div.appendChild(img);
+    div.appendChild(info);
+
+    return div;
+  }
+
+  function init() {
+    const order = getOrderFromURL();
+    if (!order || !Array.isArray(order) || order.length === 0) {
+      document.getElementById('productsContainer').innerHTML = '<p style="color:red; text-align:center;">No order data found. Please go back and select a combo first.</p>';
+      document.getElementById('orderForm').style.display = 'none';
+      return;
+    }
+
+    const productsWithImages = order.map(p => {
+      const mainProduct = products.find(mp => mp.name === p.name);
+      return {
+        ...p,
+        imageUrl: mainProduct ? mainProduct.imageUrl : ''
+      };
+    });
+
+    const productsContainer = document.getElementById('productsContainer');
+    productsContainer.innerHTML = '';
+
+    productsWithImages.forEach((prod, idx) => {
+      const prodDiv = createProductInput(prod, idx);
+      productsContainer.appendChild(prodDiv);
+    });
+
+    document.getElementById('orderForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const name = document.getElementById('customerName').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+
+      if (!name || !address || !phone) {
+        alert('Please fill all customer details.');
+        return;
+      }
+
+      let totalAmount = 0;
+      const orderDetails = [];
+
+      for (let i = 0; i < productsWithImages.length; i++) {
+        const qty = parseInt(document.getElementById(`qty${i}`).value);
+        if (isNaN(qty) || qty <= 0) {
+          alert('Please enter valid quantity for all products.');
+          return;
+        }
+        const prod = productsWithImages[i];
+        const amount = prod.price * qty;
+        totalAmount += amount;
+        orderDetails.push({
+          name: prod.name,
+          unitPrice: prod.price,
+          quantity: qty,
+          amount: amount
+        });
+      }
+
+      const orderData = {
+        customer: { name, address, phone },
+        orderDetails,
+        totalAmount,
+        orderTime: new Date().toISOString()
+      };
+
+      try {
+        // Push to a new node "orders" with unique key
+        const comboOrdersRef = ref(db, 'combo_orders');
+        const newOrderRef = push(comboOrdersRef);
+        await set(newOrderRef, orderData);
+
+
+        alert(`Order successfully placed! Total: ₹${totalAmount}`);
+        e.target.reset();
+      } catch (error) {
+        console.error("Error saving order: ", error);
+        alert('Failed to place order. Please try again.');
+      }
+    });
+  }
+
+  window.onload = init;
+</script>
+
+
+</body>
+</html>

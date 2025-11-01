@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grocery Ordering Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #f9f9f9, #e3ffe7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #2ecc71;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 20px;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .container h2 {
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+      color: #333;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-register {
+      background: #27ae60;
+    }
+
+    .btn-login {
+      background: #3498db;
+    }
+
+    .btn-admin {
+      background: #e67e22;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #f1f1f1;
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>FreshMart - Grocery Ordering Portal</h1>
+  </header>
+
+  <main> 
+    <div class="container">
+      <h2>Welcome! Choose an Option</h2>
+      <button class="btn btn-register" onclick="location.href='signup.html'">👤 User Register</button>
+      <button class="btn btn-login" onclick="location.href='signin.html'">🔑 User Login</button>
+      <button class="btn btn-admin" onclick="location.href='adminlogin.html'">🛠️ Admin Login</button>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 FreshMart Grocery | Designed by Honey 💚
+  </footer>
+
+</body>
+</html>
