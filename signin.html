@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | GroceryApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: url('grocery.jpg') no-repeat center/cover;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      backdrop-filter: blur(5px);
+    }
+    .form-box {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      color: white;
+      width: 350px;
+      text-align: center;
+    }
+    h2 { margin-bottom: 1rem; }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      outline: none;
+    }
+    input::placeholder { color: #eee; }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2ecc71;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    .link {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #eee;
+    }
+    .link a {
+      color: #00ffd5;
+      text-decoration: underline;
+    }
+    .eye {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Login to GroceryApp</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <div class="input-wrapper">
+        <input type="password" id="password" placeholder="Password" required />
+        <span class="eye" onclick="togglePassword()">👁️</span>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <div class="link">Don't have an account? <a href="signup.html">Sign up</a></div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      passwordField.type = passwordField.type === "password" ? "text" : "password";
+    }
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3wvj7pLB5AsahfRE_xd4AmEkGfRuEIZ8",
+      authDomain: "authentication-app-cf09d.firebaseapp.com",
+      databaseURL: "https://authentication-app-cf09d-default-rtdb.firebaseio.com",
+      projectId: "authentication-app-cf09d",
+      storageBucket: "authentication-app-cf09d.appspot.com",
+      messagingSenderId: "82317472416",
+      appId: "1:82317472416:web:6d0bc95248ca455c834fc5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const now = new Date();
+        const istOptions = {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        };
+        const loginTimeIST = new Intl.DateTimeFormat("en-IN", istOptions).format(now);
+
+        await push(ref(database, "users/" + user.uid + "/logins"), {
+          login_time: loginTimeIST,
+        });
+
+        alert("Login successful!");
+        window.location.href = "home.html";
+      } catch (error) {a
+        console.error("Login error:", error);
+        alert("Login failed: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
